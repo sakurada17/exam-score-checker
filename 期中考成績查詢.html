@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>中藥學概論 - 期中考成績查詢</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <style>
         body {
             font-family: "微軟正黑體", sans-serif;
@@ -159,7 +159,7 @@
             { id: "113886001", name: "謝姞卉", score: 64 }
         ];
 
-        function searchScore() {
+         function searchScore() {
             const inputId = document.getElementById("id").value.trim();
             const inputName = document.getElementById("name").value.trim();
             const resultDiv = document.getElementById("result");
@@ -188,10 +188,10 @@
                 }]
             },
             options: {
+                responsive: true,
                 scales: {
                     y: {
-                        beginAtZero: true,
-                        stepSize: 5
+                        beginAtZero: true
                     }
                 }
             }
