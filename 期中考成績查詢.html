@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>中藥學概論 - 期中考成績查詢</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: "微軟正黑體", sans-serif;
+            margin: 40px;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #006600;
+        }
+        label, input {
+            display: block;
+            margin-top: 20px;
+        }
+        input {
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e9ffe9;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>中藥學概論 - 期中考成績查詢</h1>
+
+        <p>這次考試成績分布狀態:</p>
+        <ul>
+            <li>100分: 1人</li>
+            <li>90分: 29人</li>
+            <li>80分: 27人</li>
+            <li>70分: 5人</li>
+            <li>60分: 7人</li>
+            <li>個位數: 1人</li>
+        </ul>
+        <p>平均: 85.6 (只計算在修課名單內的人)</p>
+
+        <canvas id="scoreChart" width="600" height="300"></canvas>
+
+        <label for="id">學號:</label>
+        <input type="text" id="id" placeholder="請輸入學號">
+
+        <label for="name">姓名:</label>
+        <input type="text" id="name" placeholder="請輸入姓名">
+
+        <button onclick="searchScore()">確認</button>
+
+        <div class="result" id="result" style="display:none;"></div>
+    </div>
+
+    <footer style="font-size: 30px">
+        <p>如有任何疑問，歡迎來信垂詢：112826009@cc.ncu.edu.tw</p>
+    </footer>
+</div>
+
+    <script>
+        const data = [
+            { id: "110502508", name: "黃胤凱", score: 100 },
+            { id: "112203513", name: "陳珮妤", score: 92 },
+            { id: "110202502", name: "邱媛婕", score: 96 },
+            { id: "110502509", name: "李政鍀", score: 92 },
+            { id: "111203509", name: "江伊蕾", score: 92 },
+            { id: "110602510", name: "黃韋慈", score: 96 },
+            { id: "111303012", name: "林俊廷", score: 92 },
+            { id: "112203501", name: "林苡瑄", score: 92 },
+            { id: "112203510", name: "魯凡妤", score: 96 },
+            { id: "110403510", name: "張綺容", score: 92 },
+            { id: "110403552", name: "王冠程", score: 96 },
+            { id: "111303004", name: "李柏穎", score: 92 },
+            { id: "112203509", name: "陳思彤", score: 96 },
+            { id: "112203522", name: "陳竑甫", score: 92 },
+            { id: "112203521", name: "葉哲瑋", score: 95 },
+            { id: "111203013", name: "謝竣宇", score: 95 },
+            { id: "112203507", name: "顏羽柔", score: 92 },
+            { id: "111203516", name: "李梓豪", score: 91 },
+            { id: "112203002", name: "賀嬿榕", score: 91 },
+            { id: "111303037", name: "吳致融", score: 96 },
+            { id: "111401503", name: "張祐瑄", score: 96 },
+            { id: "112203516", name: "吳承諺", score: 92 },
+            { id: "112203523", name: "王竣永", score: 96 },
+            { id: "111303002", name: "周家瑜", score: 92 },
+            { id: "111203504", name: "施喬真", score: 92 },
+            { id: "111203514", name: "蘇紘域", score: 96 },
+            { id: "111203014", name: "王嘉陽", score: 92 },
+            { id: "112203502", name: "陳羽貞", score: 92 },
+            { id: "112203003", name: "戴辰安", score: 94 },
+            { id: "110203525", name: "陳羿勳", score: 92 },
+            { id: "110802502", name: "林苡庭", score: 88 },
+            { id: "110802504", name: "黃鈺婷", score: 87 },
+            { id: "111203502", name: "張可欣", score: 84 },
+            { id: "110502002", name: "江怜儀", score: 88 },
+            { id: "111202502", name: "李蕎伊", score: 88 },
+            { id: "110102523", name: "張瓈文", score: 83 },
+            { id: "112203518", name: "嚴博耀", score: 83 },
+            { id: "112203009", name: "李侑晉", score: 88 },
+            { id: "111303566", name: "謝秉宏", score: 83 },
+            { id: "111303522", name: "王郁賢", score: 84 },
+            { id: "111303016", name: "曾崇恩", score: 86 },
+            { id: "110403530", name: "黃欣慈", score: 88 },
+            { id: "110403538", name: "賴羿文", score: 88 },
+            { id: "111303003", name: "林依潔", score: 84 },
+            { id: "112203512", name: "羅晨嘉", score: 87 },
+            { id: "111101509", name: "陳惠玟", score: 84 },
+            { id: "111203517", name: "吳竑德", score: 88 },
+            { id: "111203523", name: "鄭柏勳", score: 84 },
+            { id: "112203517", name: "廖翊丞", score: 88 },
+            { id: "110501011", name: "洪麒凱", score: 84 },
+            { id: "112203515", name: "王毓霖", score: 87 },
+            { id: "111203010", name: "陳建箖", score: 88 },
+            { id: "111203016", name: "顏琮恩", score: 84 },
+            { id: "112203006", name: "許薰云", score: 84 },
+            { id: "111303010", name: "鄭誠翊", score: 84 },
+            { id: "111101509", name: "陳惠玟", score: 84 },
+            { id: "111602517", name: "方詣夫", score: 88 },
+            { id: "110801517", name: "蘇冠諭", score: 86 },
+            { id: "111605012", name: "羅智偉", score: 72 },
+            { id: "111203003", name: "林秀真", score: 70 },
+            { id: "112203015", name: "王俊翔", score: 72 },
+            { id: "111203012", name: "陳厚杰", score: 73 },
+            { id: "110801005", name: "黃韻瑄", score: 73 },
+            { id: "110201505", name: "潘聿琳", score: 60 },
+            { id: "110201517", name: "蕭富元", score: 60 },
+            { id: "111602532", name: "陳聖文", score: 67 },
+            { id: "112203013", name: "彭泊睿", score: 64 },
+            { id: "112203508", name: "賴宛妤", score: 60 },
+            { id: "111101517", name: "許鈺玟", score: 64 },
+            { id: "111303206", name: "潘兆俊", score: 8 },
+            { id: "113886001", name: "謝姞卉", score: 64 }
+        ];
+
+        function searchScore() {
+            const inputId = document.getElementById("id").value.trim();
+            const inputName = document.getElementById("name").value.trim();
+            const resultDiv = document.getElementById("result");
+            const student = data.find(s => s.id === inputId && s.name === inputName);
+
+            if (student) {
+                resultDiv.innerHTML = `<p>學號: ${student.id}</p><p>姓名: ${student.name}</p><p>成績: ${student.score}</p>`;
+            } else {
+                resultDiv.innerHTML = "查無資料，請確認學號與姓名是否正確。";
+            }
+            resultDiv.style.display = "block";
+        }
+
+        const ctx = document.getElementById('scoreChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['個位數', '60分', '70分', '80分', '90分', '100分'],
+                datasets: [{
+                    label: '人數分佈',
+                    data: [1, 7, 5, 27, 29, 1],
+                    borderColor: 'rgba(0,123,255,1)',
+                    backgroundColor: 'rgba(0,123,255,0.2)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        stepSize: 5
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
